@@ -1,0 +1,4 @@
+https://www.baeldung.com/java-aes-encryption-decryption
+
+- the password encryption and decryption part
+- the UI part

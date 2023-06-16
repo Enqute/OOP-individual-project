@@ -1,139 +1,75 @@
-import javax.crypto.Cipher;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Scanner;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 
 public class Main {
 
-//    public static String sha256(final String base) {
-//        try{
-//            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-//            final byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
-//            final StringBuilder hexString = new StringBuilder();
-//            for (byte b : hash) {
-//                final String hex = Integer.toHexString(0xff & b);
-//                if (hex.length() == 1)
-//                    hexString.append('0');
-//                hexString.append(hex);
-//            }
-//            return hexString.toString();
-//        } catch(Exception ex){
-//            throw new RuntimeException(ex);
-//        }
-//    }
-//
 //    public static void main(String[] args) throws Exception {
-//        String text = "Hello there";
-////        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-////        byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-////        System.out.println(Arrays.toString(hash));
-//        String hash = sha256(text);
-//        System.out.println(hash);
+////        Security.addProvider(new org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider());
+//        String plainText = "This message will encrypted using AES";
+//
+//        AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("AES");
+//        paramGen.init(128);
+//        AlgorithmParameters params = paramGen.generateParameters();
+//
+//        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+//        keyGen.init(128);
+//        SecretKey secretKey = (SecretKey) Cipher.getInstance("AES/CBC/PKC7Padding");
+//
+//        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+//        cipher.init(Cipher.ENCRYPT_MODE, secretKey, params);
+//        byte[] encryptedText = cipher.doFinal(plainText.getBytes());
+//        cipher.init(Cipher.DECRYPT_MODE, secretKey, params);
+//        byte[] decryptedText = cipher.doFinal(encryptedText);
+//
+//        System.out.println("Palin text: " + plainText);
+//        System.out.println("Encrypted text: " + new String(encryptedText));
+//        System.out.println("Decrypted text: " + new String(decryptedText));
 //    }
 
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
-
-    public Main() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024);
-        KeyPair pair = keyGen.generateKeyPair();
-        this.privateKey = pair.getPrivate();
-        this.publicKey = pair.getPublic();
+    public static SecretKey generateKey(int n) throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(n);
+        return keyGenerator.generateKey();
     }
 
-    public static String byteToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            final String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1)
-                sb.append('0');
-            sb.append(hex);
-        }
-        return sb.toString();
+    public static SecretKey getKeyFromPassword(String password, String salt)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
+        return new SecretKeySpec(factory.generateSecret(spec)
+                .getEncoded(), "AES");
     }
 
-    private static String readFile(String filepath) throws Exception {
-        File file = new File(filepath);
-        Scanner scan = new Scanner(file);
-        StringBuilder sb = new StringBuilder();
-        InputStream stream = new FileInputStream(file);
-        byte[] b = new byte[(int)file.length()];
-        stream.read(b);
-//        return byteToHex(b);
-//        System.out.println(new String(b, StandardCharsets.UTF_8));
-        return new String(b, StandardCharsets.UTF_8);
+//    public static IvParameterSpec generateIv() {
+//        byte[] iv = new byte[16];
+//        new SecureRandom().nextBytes(iv);
+//        return new IvParameterSpec(iv);
+//    }
+
+    public static void main(String[] args) throws NoSuchAlgorithmException, IOException, IllegalBlockSizeException,
+            InvalidKeyException, BadPaddingException, InvalidAlgorithmParameterException,
+            NoSuchPaddingException, URISyntaxException {
+
+        SecretKey key = Main.generateKey(128);
+        String algorithm = "AES/CBC/PKCS5Padding";
+        AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance(algorithm.split("/")[0]);
+
+//        IvParameterSpec ivParameterSpec = Main.generateIv();
+        File inputFile = new File("src/hello.txt");
+        File encryptedFile = new File("hello.encrypted");
+        File decryptedFile = new File("hello.decrypted");
+        Encrypt.encryptFile(algorithm, key, paramGen, inputFile, encryptedFile);
+        Decrypt.decryptFile(
+                algorithm, key, paramGen, encryptedFile, decryptedFile);
+//        assertThat(inputFile).hasSameTextualContentAs(decryptedFile);
     }
-
-    public void writeToFile(String path, byte[] key) throws IOException {
-        File f = new File(path);
-        f.getParentFile().mkdirs();
-
-        Files.writeString(Path.of(f.getAbsolutePath()), new String(key, StandardCharsets.UTF_8));
-    }
-
-    public static PublicKey getPublicKeyFromFile(String base64PublicKey){
-        PublicKey publicKey = null;
-        try{
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey.getBytes()));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            publicKey = keyFactory.generatePublic(keySpec);
-            return publicKey;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return publicKey;
-    }
-
-    public static PrivateKey getPrivateKeyFromFile(String base64PrivateKey){
-        PrivateKey privateKey = null;
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(base64PrivateKey.getBytes()));
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            privateKey = keyFactory.generatePrivate(keySpec);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return privateKey;
-    }
-
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    public static void main(String[] args) throws Exception {
-        Main keyPairGenerator = new Main();
-        keyPairGenerator.writeToFile("RSA/publicKey.key", keyPairGenerator.getPublicKey().getEncoded());
-        keyPairGenerator.writeToFile("RSA/privateKey.key", keyPairGenerator.getPrivateKey().getEncoded());
-
-//        System.out.println(keyPairGenerator.getPrivateKey().);
-
-        File pf = new File("RSA/publicKey.key");
-        File pr = new File("RSA/privateKey.key");
-
-        PrivateKey prk = getPrivateKeyFromFile(readFile(pr.getAbsolutePath()));
-        PublicKey puk = getPublicKeyFromFile(readFile(pf.getAbsolutePath()));
-
-        System.out.println(Base64.getEncoder().encodeToString(puk.getEncoded()));
-        System.out.println(Base64.getEncoder().encodeToString(prk.getEncoded()));
-    }
-
-
 
 }
