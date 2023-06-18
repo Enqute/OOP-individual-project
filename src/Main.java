@@ -1,15 +1,17 @@
+import Utils.Decrypt;
+import Utils.Encrypt;
+import Utils.Generator;
+import Utils.Program;
+import Views.MainPage;
+
 import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 
 public class Main {
-
 //    public static void main(String[] args) throws Exception {
 ////        Security.addProvider(new org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider());
 //        String plainText = "This message will encrypted using AES";
@@ -31,45 +33,28 @@ public class Main {
 //        System.out.println("Palin text: " + plainText);
 //        System.out.println("Encrypted text: " + new String(encryptedText));
 //        System.out.println("Decrypted text: " + new String(decryptedText));
-//    }
-
-    public static SecretKey generateKey(int n) throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(n);
-        return keyGenerator.generateKey();
-    }
-
-    public static SecretKey getKeyFromPassword(String password, String salt)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
-        return new SecretKeySpec(factory.generateSecret(spec)
-                .getEncoded(), "AES");
-    }
-
-//    public static IvParameterSpec generateIv() {
-//        byte[] iv = new byte[16];
-//        new SecureRandom().nextBytes(iv);
-//        return new IvParameterSpec(iv);
-//    }
+//
 
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException, IllegalBlockSizeException,
             InvalidKeyException, BadPaddingException, InvalidAlgorithmParameterException,
             NoSuchPaddingException, URISyntaxException {
 
-        SecretKey key = Main.generateKey(128);
+        SecretKey key = Generator.generateKey(128);
         String algorithm = "AES/CBC/PKCS5Padding";
-        AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance(algorithm.split("/")[0]);
+//        AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance(algorithm.split("/")[0]);
 
-//        IvParameterSpec ivParameterSpec = Main.generateIv();
-        File inputFile = new File("src/hello.txt");
-        File encryptedFile = new File("hello.encrypted");
-        File decryptedFile = new File("hello.decrypted");
-        Encrypt.encryptFile(algorithm, key, paramGen, inputFile, encryptedFile);
+        /*
+        IvParameterSpec ivParameterSpec = Generator.generateIv();
+        File inputFile = new File("res/hello.txt");
+        File encryptedFile = new File("res/hello.encrypted");
+        File decryptedFile = new File("res/hello.decrypted");
+        Encrypt.encryptFile(algorithm, key, ivParameterSpec, inputFile, encryptedFile);
         Decrypt.decryptFile(
-                algorithm, key, paramGen, encryptedFile, decryptedFile);
+                algorithm, key, ivParameterSpec, encryptedFile, decryptedFile);
+        */
 //        assertThat(inputFile).hasSameTextualContentAs(decryptedFile);
+
+        Program page = new MainPage();
     }
 
 }

@@ -1,4 +1,7 @@
+package Utils;
+
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.security.*;
 import java.util.Base64;
@@ -18,13 +21,13 @@ public class Decrypt {
         return new String(plainText);
     }
 
-    public static void decryptFile(String algorithm, SecretKey key, AlgorithmParameterGenerator paramsGen,
+    public static void decryptFile(String algorithm, SecretKey key, IvParameterSpec params,
                                    File inputFile, File outputFile) throws IOException, NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher = Cipher.getInstance(algorithm);
-        AlgorithmParameters params = paramsGen.generateParameters();
+//        AlgorithmParameters params = paramsGen.generateParameters();
         cipher.init(Cipher.DECRYPT_MODE, key, params);
         FileInputStream inputStream = new FileInputStream(inputFile);
         FileOutputStream outputStream = new FileOutputStream(outputFile);
