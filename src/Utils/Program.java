@@ -1,7 +1,12 @@
 package Utils;
 
+import org.apache.commons.imaging.Imaging;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.List;
 
 public class Program extends JFrame implements Runnable {
 
@@ -43,10 +48,28 @@ public class Program extends JFrame implements Runnable {
         this.setFocusable(true);
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        try {
+            List<BufferedImage> images = Imaging.getAllBufferedImages(new File("res/images/favicon.ico"));
+            this.setIconImage(images.get(0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         this.add(background);
 
 //        this.setVisible(true);
+    }
+
+    public static void addEmpty(JPanel panel, GridBagConstraints c, int n, int prev, int fontSize) {
+        for (int i = prev + 1; i <= n + 1; i++) {
+//            JPanel emptyPanel = new JPanel();
+//            emptyPanel.setBackground(Color.decode(color));
+            JLabel emptyText = new JLabel(" ");
+            emptyText.setFont(new Font("Segoe UI", Font.BOLD, fontSize));
+            c.gridx = 0;
+            c.gridy = i;
+            panel.add(emptyText, c);
+        }
     }
 }
