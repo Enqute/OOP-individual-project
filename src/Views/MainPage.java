@@ -3,6 +3,8 @@ package Views;
 import Utils.Program;
 
 import javax.swing.*;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class MainPage extends Program {
@@ -66,6 +68,14 @@ public class MainPage extends Program {
 
         Program.addEmpty(top, c1, 1, 0, 30);
 
+        JLabel typeTopLbl = new JLabel("Configuration");
+        typeTopLbl.setForeground(Color.decode("#818181"));
+        typeTopLbl.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+
+        c1.gridx = 0;
+        c1.gridy = 2;
+        top.add(typeTopLbl, c1);
+
         JRadioButton fileRbtn = new JRadioButton("File");
         fileRbtn.setSize(200, 60);
         fileRbtn.setForeground(Color.decode("#ffffff"));
@@ -95,7 +105,7 @@ public class MainPage extends Program {
 
         JPanel textTypePanel = new JPanel();
         textTypePanel.setBackground(Color.decode("#212121"));
-        textTypePanel.setSize(width, height);
+//        textTypePanel.setSize(width, height);
 
         JLabel textTypeLbl = new JLabel("Text type", JLabel.LEFT);
         textTypeLbl.setForeground(Color.decode("#3eb6f7"));
@@ -110,10 +120,6 @@ public class MainPage extends Program {
         for (int i = 0; i < 100; i++)
             empLbl1.setText(empLbl1.getText() + "     ");
         textTypePanel.add(empLbl1);
-
-        c1.gridx = 0;
-        c1.gridy = 2;
-        top.add(textTypePanel, c1);
 
         JRadioButton aesRbtn = new JRadioButton("AES");
         aesRbtn.setSize(200, 60);
@@ -144,7 +150,7 @@ public class MainPage extends Program {
 
         JPanel algoTypePanel = new JPanel();
         algoTypePanel.setBackground(Color.decode("#212121"));
-        algoTypePanel.setSize(width, height);
+//        algoTypePanel.setSize(width, height);
 
         JLabel algoTypeLbl = new JLabel("Algorithm type", JLabel.LEFT);
         algoTypeLbl.setForeground(Color.decode("#3eb6f7"));
@@ -160,22 +166,57 @@ public class MainPage extends Program {
             empLbl2.setText(empLbl2.getText() + "     ");
         algoTypePanel.add(empLbl2);
 
+        AbstractBorder typeBorder = new Program.TextBubbleBorder(Color.decode("#3c3c3c"), 1, 20);
+        JPanel typePanel = new JPanel();
+        typePanel.setLayout(new GridBagLayout());
+        typePanel.setBackground(Color.decode("#212121"));
+        typePanel.setBorder(typeBorder);
+
+        c1.gridx = 0;
+        c1.gridy = 0;
+        typePanel.add(textTypePanel, c1);
+        c1.gridx = 0;
+        c1.gridy = 1;
+        typePanel.add(algoTypePanel, c1);
+
         c1.gridx = 0;
         c1.gridy = 3;
-        top.add(algoTypePanel, c1);
+        top.add(typePanel, c1);
 
-        Program.addEmpty(top, c1, 10, 2, 40);
+//        Program.addEmpty(top, c1, 5, 3, 40);
+
+        JLabel cryptoLbl = new JLabel("Encryption & Decryption");
+        cryptoLbl.setForeground(Color.decode("#818181"));
+        cryptoLbl.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+
+        c1.gridx = 0;
+        c1.gridy = 5;
+        top.add(cryptoLbl, c1);
+
+        AbstractBorder cryptoBorder = new Program.TextBubbleBorder(Color.decode("#404040"), 1, 20);
+        JPanel cryptoPanel = new JPanel();
+        cryptoPanel.setLayout(new GridBagLayout());
+        cryptoPanel.setBackground(Color.decode("#212121"));
+        cryptoPanel.setBorder(cryptoBorder);
+
+        
+
+        c1.gridx = 0;
+        c1.gridy = 6;
+        top.add(cryptoPanel, c1);
+
+        Program.addEmpty(top, c1, 15, 3, 40);
 
         con.gridx = 0;
         con.gridy = 0;
         this.background.add(top, con);
-
-        JPanel bottom = new JPanel();
-        bottom.setBackground(Color.decode("#212121"));
-
-        con.gridx = 0;
-        con.gridy = 1;
-        this.background.add(bottom, con);
+//
+//        JPanel bottom = new JPanel();
+//        bottom.setBackground(Color.decode("#212121"));
+//
+//        con.gridx = 0;
+//        con.gridy = 1;
+//        this.background.add(bottom, con);
 
 //        JPanel middleRight = new JPanel();
 //        middleRight.setBackground(Color.decode("#212121"));
