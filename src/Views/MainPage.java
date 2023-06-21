@@ -199,7 +199,66 @@ public class MainPage extends Program {
         cryptoPanel.setBackground(Color.decode("#212121"));
         cryptoPanel.setBorder(cryptoBorder);
 
-        
+        JPanel leftSideCrypto = new JPanel();
+        leftSideCrypto.setLayout(new GridBagLayout());
+        leftSideCrypto.setBackground(Color.decode("#212121"));
+
+        JLabel inputLbl = new JLabel("Input");
+        inputLbl.setForeground(Color.decode("#818181"));
+        inputLbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
+        JTextArea inputArea = new JTextArea();
+        inputArea.setLineWrap(true);
+        inputArea.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        inputArea.setTabSize(4);
+        inputArea.setWrapStyleWord(true);
+        inputArea.setBackground(Color.decode("#323232"));
+        inputArea.setForeground(Color.decode("#f5f5f5"));
+
+        c1.gridx = 0;
+        c1.gridy = 0;
+        leftSideCrypto.add(inputLbl, c1);
+        c1.gridx = 0;
+        c1.gridy = 1;
+        leftSideCrypto.add(inputArea, c1);
+
+
+        JPanel middleCrypto = new JPanel();
+        leftSideCrypto.setLayout(new GridBagLayout());
+        leftSideCrypto.setBackground(Color.decode("#212121"));
+
+        JPanel rightSideCrypto = new JPanel();
+        leftSideCrypto.setLayout(new GridBagLayout());
+        leftSideCrypto.setBackground(Color.decode("#212121"));
+
+        JLabel resultLbl = new JLabel("Result");
+        resultLbl.setForeground(Color.decode("#818181"));
+        resultLbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
+        JTextArea resultArea = new JTextArea();
+        resultArea.setLineWrap(true);
+        resultArea.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        resultArea.setTabSize(4);
+        resultArea.setWrapStyleWord(true);
+
+        c1.gridx = 0;
+        c1.gridy = 0;
+        leftSideCrypto.add(resultLbl, c1);
+        c1.gridx = 0;
+        c1.gridy = 1;
+        leftSideCrypto.add(resultArea, c1);
+
+        c1.gridx = 0;
+        c1.gridy = 0;
+        cryptoPanel.add(leftSideCrypto, c1);
+
+        c1.gridx = 1;
+        c1.gridy = 0;
+        cryptoPanel.add(middleCrypto, c1);
+
+        c1.gridx = 2;
+        c1.gridy = 0;
+        cryptoPanel.add(rightSideCrypto, c1);
 
         c1.gridx = 0;
         c1.gridy = 6;
