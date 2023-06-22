@@ -1,11 +1,21 @@
 package Views;
 
+import Utils.Decrypt;
+import Utils.Encrypt;
+import Utils.Generator;
 import Utils.Program;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.File;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class MainPage extends Program {
 
@@ -13,6 +23,11 @@ public class MainPage extends Program {
     private static boolean isAES = true;
 
     public MainPage() {
+        if (isAES) {
+            Program.ivParams = Generator.generateIvForAES();
+        } else {
+            Program.ivParams = Generator.generateIvForDES();
+        }
         this.setVisible(true);
     }
 
@@ -37,7 +52,7 @@ public class MainPage extends Program {
         top.setBackground(Color.decode("#212121"));
 
         GridBagConstraints c1 = new GridBagConstraints();
-        c1.fill = GridBagConstraints.HORIZONTAL;
+        c1.fill = GridBagConstraints.BOTH;
         c1.weightx = 1;
         c1.weighty = 1;
 
@@ -52,7 +67,7 @@ public class MainPage extends Program {
         c1.gridy = 0;
         topTextPanel.add(topTitle, c1);
 
-        Program.addEmpty(topTextPanel, c1, 1, 0, 20);
+        Program.addEmpty(topTextPanel, c1, 1, 0, 20, true);
 
         JLabel topDescription = new JLabel("This program has a bit cryptographic function, " +
                 "which does encryption and decryption operation on file or a text!", JLabel.CENTER);
@@ -66,7 +81,7 @@ public class MainPage extends Program {
         c1.gridy = 0;
         top.add(topTextPanel, c1);
 
-        Program.addEmpty(top, c1, 1, 0, 30);
+        Program.addEmpty(top, c1, 1, 0, 30, true);
 
         JLabel typeTopLbl = new JLabel("Configuration");
         typeTopLbl.setForeground(Color.decode("#818181"));
@@ -93,16 +108,6 @@ public class MainPage extends Program {
         textTypeGrp.add(fileRbtn);
         textTypeGrp.add(textRbtn);
 
-        fileRbtn.addActionListener(e -> {
-            if (isTextType)
-                isTextType = false;
-        });
-
-        textRbtn.addActionListener(e -> {
-            if (!isTextType)
-                isTextType = true;
-        });
-
         JPanel textTypePanel = new JPanel();
         textTypePanel.setBackground(Color.decode("#212121"));
 //        textTypePanel.setSize(width, height);
@@ -112,12 +117,18 @@ public class MainPage extends Program {
         textTypeLbl.setFont(new Font("Segoe UI", Font.BOLD, 17));
 
         textTypePanel.add(textTypeLbl);
-        textTypePanel.add(new JLabel("                    "));
+        textTypePanel.add(new JLabel("            "));
         textTypePanel.add(fileRbtn);
         textTypePanel.add(new JLabel("    "));
         textTypePanel.add(textRbtn);
         JLabel empLbl1 = new JLabel("     ");
-        for (int i = 0; i < 100; i++)
+        int n;
+        if (width >= 1900) { // 1080 HD Screen resolution
+            n = 102;
+        } else {
+            n = 65;
+        }
+        for (int i = 0; i < n; i++)
             empLbl1.setText(empLbl1.getText() + "     ");
         textTypePanel.add(empLbl1);
 
@@ -134,10 +145,6 @@ public class MainPage extends Program {
         desRbtn.setBackground(Color.decode("#212121"));
         desRbtn.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 
-        ButtonGroup algoTypeGrp = new ButtonGroup();
-        algoTypeGrp.add(aesRbtn);
-        algoTypeGrp.add(desRbtn);
-
         aesRbtn.addActionListener(e -> {
             if (!isAES)
                 isAES = true;
@@ -147,6 +154,10 @@ public class MainPage extends Program {
             if (isAES)
                 isAES = false;
         });
+
+        ButtonGroup algoTypeGrp = new ButtonGroup();
+        algoTypeGrp.add(aesRbtn);
+        algoTypeGrp.add(desRbtn);
 
         JPanel algoTypePanel = new JPanel();
         algoTypePanel.setBackground(Color.decode("#212121"));
@@ -162,11 +173,11 @@ public class MainPage extends Program {
         algoTypePanel.add(new JLabel("    "));
         algoTypePanel.add(desRbtn);
         JLabel empLbl2 = new JLabel("     ");
-        for (int i = 0; i < 102; i++)
+        for (int i = 0; i < n; i++)
             empLbl2.setText(empLbl2.getText() + "     ");
         algoTypePanel.add(empLbl2);
 
-        AbstractBorder typeBorder = new Program.TextBubbleBorder(Color.decode("#3c3c3c"), 1, 20);
+        AbstractBorder typeBorder = new TextBubbleBorder(Color.decode("#3c3c3c"), 1, 20);
         JPanel typePanel = new JPanel();
         typePanel.setLayout(new GridBagLayout());
         typePanel.setBackground(Color.decode("#212121"));
@@ -185,7 +196,7 @@ public class MainPage extends Program {
 
 //        Program.addEmpty(top, c1, 5, 3, 40);
 
-        JLabel cryptoLbl = new JLabel("Encryption & Decryption");
+        JLabel cryptoLbl = new JLabel("Operation");
         cryptoLbl.setForeground(Color.decode("#818181"));
         cryptoLbl.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 
@@ -193,7 +204,7 @@ public class MainPage extends Program {
         c1.gridy = 5;
         top.add(cryptoLbl, c1);
 
-        AbstractBorder cryptoBorder = new Program.TextBubbleBorder(Color.decode("#404040"), 1, 20);
+        AbstractBorder cryptoBorder = new TextBubbleBorder(Color.decode("#404040"), 1, 20);
         JPanel cryptoPanel = new JPanel();
         cryptoPanel.setLayout(new GridBagLayout());
         cryptoPanel.setBackground(Color.decode("#212121"));
@@ -203,8 +214,8 @@ public class MainPage extends Program {
         leftSideCrypto.setLayout(new GridBagLayout());
         leftSideCrypto.setBackground(Color.decode("#212121"));
 
-        JLabel inputLbl = new JLabel("Input");
-        inputLbl.setForeground(Color.decode("#818181"));
+        JLabel inputLbl = new JLabel("Input text");
+        inputLbl.setForeground(Color.decode("#e5e5e5"));
         inputLbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         JTextArea inputArea = new JTextArea();
@@ -214,6 +225,8 @@ public class MainPage extends Program {
         inputArea.setWrapStyleWord(true);
         inputArea.setBackground(Color.decode("#323232"));
         inputArea.setForeground(Color.decode("#f5f5f5"));
+        inputArea.setBorder(cryptoBorder);
+        inputArea.setToolTipText("Enter the plain text here");
 
         c1.gridx = 0;
         c1.gridy = 0;
@@ -222,41 +235,125 @@ public class MainPage extends Program {
         c1.gridy = 1;
         leftSideCrypto.add(inputArea, c1);
 
-
         JPanel middleCrypto = new JPanel();
-        leftSideCrypto.setLayout(new GridBagLayout());
-        leftSideCrypto.setBackground(Color.decode("#212121"));
+        middleCrypto.setLayout(new GridBagLayout());
+        middleCrypto.setBackground(Color.decode("#212121"));
+
+        AbstractBorder buttonBorder = new TextBubbleBorder(Color.decode("#1c94d5"), 2, 14);
+        JButton encryptBtn = new JButton("Encrypt");
+        encryptBtn.setBackground(Color.decode("#1c94d5"));
+        encryptBtn.setForeground(Color.decode("#ffffff"));
+        encryptBtn.setBorder(buttonBorder);
+        encryptBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        JButton decryptBtn = new JButton("Decrypt");
+        decryptBtn.setBackground(Color.decode("#1c94d5"));
+        decryptBtn.setForeground(Color.decode("#ffffff"));
+        decryptBtn.setBorder(buttonBorder);
+        decryptBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        c1.gridx = 0;
+        c1.gridy = 0;
+        middleCrypto.add(encryptBtn, c1);
+        Program.addEmpty(middleCrypto, c1, 1, 0, 10, true);
+        c1.gridx = 0;
+        c1.gridy = 2;
+        middleCrypto.add(decryptBtn, c1);
 
         JPanel rightSideCrypto = new JPanel();
-        leftSideCrypto.setLayout(new GridBagLayout());
-        leftSideCrypto.setBackground(Color.decode("#212121"));
+        rightSideCrypto.setLayout(new GridBagLayout());
+        rightSideCrypto.setBackground(Color.decode("#212121"));
 
         JLabel resultLbl = new JLabel("Result");
-        resultLbl.setForeground(Color.decode("#818181"));
+        resultLbl.setForeground(Color.decode("#e5e5e5"));
         resultLbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         JTextArea resultArea = new JTextArea();
         resultArea.setLineWrap(true);
         resultArea.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         resultArea.setTabSize(4);
-        resultArea.setWrapStyleWord(true);
+        resultArea.setWrapStyleWord(false);
+        resultArea.setBackground(Color.decode("#323232"));
+        resultArea.setForeground(Color.decode("#f5f5f5"));
+        resultArea.setBorder(cryptoBorder);
+//        resultArea.setEnabled(false);
+
+        encryptBtn.addActionListener(ev -> {
+            try {
+                if (isTextType) {
+                    resultArea.setText(Encrypt.encrypt(
+                            isAES ? Program.AESAlgorithm : Program.DESAlgorithm,
+                            inputArea.getText(), Program.key, Program.ivParams));
+                } else {
+                    String[] temp = inputArea.getText().split("\\.");
+                    File outputFile = new File(temp[0] + ".encrypted");
+                    File intputFile = new File(inputArea.getText());
+                    Encrypt.encryptFile(
+                            isAES ? Program.AESAlgorithm : Program.DESAlgorithm,
+                            Program.key, Program.ivParams, intputFile, outputFile);
+                    resultArea.setText(outputFile.toString());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        decryptBtn.addActionListener(ev -> {
+            try {
+                if (isTextType) {
+                    resultArea.setText(Decrypt.decrypt(
+                            isAES ? Program.AESAlgorithm : Program.DESAlgorithm,
+                            inputArea.getText(), Program.key, Program.ivParams));
+                } else {
+                    String[] temp = inputArea.getText().split("\\.");
+                    File outputFile = new File(temp[0] + ".decrypted");
+                    File intputFile = new File(temp[0] + ".encrypted");
+                    Decrypt.decryptFile(
+                            isAES ? Program.AESAlgorithm : Program.DESAlgorithm,
+                            Program.key, Program.ivParams, intputFile, outputFile);
+                    resultArea.setText(outputFile.toString());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        fileRbtn.addActionListener(e -> {
+            if (isTextType) {
+                isTextType = false;
+                inputLbl.setText("Input filepath");
+                inputArea.setToolTipText("Enter file path here");
+            }
+        });
+
+        textRbtn.addActionListener(e -> {
+            if (!isTextType) {
+                isTextType = true;
+                inputLbl.setText("Input text");
+                inputArea.setToolTipText("Enter plain text here");
+            }
+        });
 
         c1.gridx = 0;
         c1.gridy = 0;
-        leftSideCrypto.add(resultLbl, c1);
+        rightSideCrypto.add(resultLbl, c1);
         c1.gridx = 0;
         c1.gridy = 1;
-        leftSideCrypto.add(resultArea, c1);
+        rightSideCrypto.add(resultArea, c1);
 
         c1.gridx = 0;
         c1.gridy = 0;
         cryptoPanel.add(leftSideCrypto, c1);
 
-        c1.gridx = 1;
+        Program.addEmpty(cryptoPanel, c1, 3, 0, 30, false);
+
+        c1.gridx = 4;
         c1.gridy = 0;
         cryptoPanel.add(middleCrypto, c1);
 
-        c1.gridx = 2;
+        Program.addEmpty(cryptoPanel, c1, 6, 4, 30, false);
+
+        c1.gridx = 11;
         c1.gridy = 0;
         cryptoPanel.add(rightSideCrypto, c1);
 
@@ -264,7 +361,12 @@ public class MainPage extends Program {
         c1.gridy = 6;
         top.add(cryptoPanel, c1);
 
-        Program.addEmpty(top, c1, 15, 3, 40);
+        int vSpacing;
+        if (width >= 1900)
+            vSpacing = 15;
+        else vSpacing = 7;
+        c1.gridheight = 1;
+        Program.addEmpty(top, c1, vSpacing, 6, 40, true);
 
         con.gridx = 0;
         con.gridy = 0;

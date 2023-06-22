@@ -2,6 +2,8 @@ package Utils;
 
 import org.apache.commons.imaging.Imaging;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import java.awt.*;
@@ -9,15 +11,22 @@ import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class Program extends JFrame implements Runnable {
 
-    public int width;
-    public int height;
-    public boolean isRunning;
+    protected int width;
+    protected int height;
+    protected boolean isRunning;
     protected JPanel background = new JPanel();
     protected GridLayout layout = new GridLayout();
+
+    public static SecretKey key;
+    public static IvParameterSpec ivParams;
+
+    public static String AESAlgorithm = "AES/CBC/PKCS5Padding";
+    public static String DESAlgorithm = "TripleDES/CBC/PKCS5Padding";
 
     public Program() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -64,19 +73,25 @@ public class Program extends JFrame implements Runnable {
 //        this.setVisible(true);
     }
 
-    public static void addEmpty(JPanel panel, GridBagConstraints c, int n, int prev, int fontSize) {
+    public static void addEmpty(JPanel panel, GridBagConstraints c, int n,
+                                int prev, int fontSize, boolean isVertical) {
         for (int i = prev + 1; i <= n + 1; i++) {
 //            JPanel emptyPanel = new JPanel();
 //            emptyPanel.setBackground(Color.decode(color));
             JLabel emptyText = new JLabel(" ");
             emptyText.setFont(new Font("Segoe UI", Font.BOLD, fontSize));
-            c.gridx = 0;
-            c.gridy = i;
+            if (isVertical) {
+                c.gridx = 0;
+                c.gridy = i;
+            } else {
+                c.gridx = i;
+                c.gridy = 0;
+            }
             panel.add(emptyText, c);
         }
     }
 
-    public class TextBubbleBorder extends AbstractBorder {
+    public static class TextBubbleBorder extends AbstractBorder {
 
         private Color color;
         private int thickness = 4;

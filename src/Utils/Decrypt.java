@@ -9,12 +9,12 @@ import java.util.Base64;
 public class Decrypt {
 
     public static String decrypt(String algorithm, String cipherText, SecretKey key,
-                                 AlgorithmParameterGenerator paramsGen) throws NoSuchPaddingException, NoSuchAlgorithmException,
+                                 IvParameterSpec params) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher = Cipher.getInstance(algorithm);
-        AlgorithmParameters params = paramsGen.generateParameters();
+//        AlgorithmParameters params = paramsGen.generateParameters();
         cipher.init(Cipher.DECRYPT_MODE, key, params);
         byte[] plainText = cipher.doFinal(Base64.getDecoder()
                 .decode(cipherText));

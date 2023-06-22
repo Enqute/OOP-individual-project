@@ -10,12 +10,12 @@ import java.util.Base64;
 public class Encrypt {
 
     public static String encrypt(String algorithm, String input, SecretKey key,
-                                 AlgorithmParameterGenerator paramsGen) throws NoSuchPaddingException, NoSuchAlgorithmException,
+                                 IvParameterSpec params) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher = Cipher.getInstance(algorithm);
-        AlgorithmParameters params = paramsGen.generateParameters();
+//        AlgorithmParameters params = paramsGen.generateParameters();
         cipher.init(Cipher.ENCRYPT_MODE, key, params);
         byte[] cipherText = cipher.doFinal(input.getBytes());
         return Base64.getEncoder()

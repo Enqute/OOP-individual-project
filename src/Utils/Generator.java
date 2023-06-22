@@ -28,8 +28,14 @@ public class Generator {
                 .getEncoded(), "AES");
     }
 
-    public static IvParameterSpec generateIv() {
+    public static IvParameterSpec generateIvForAES() {
         byte[] iv = new byte[16];
+        new SecureRandom().nextBytes(iv);
+        return new IvParameterSpec(iv);
+    }
+
+    public static IvParameterSpec generateIvForDES() {
+        byte[] iv = new byte[8];
         new SecureRandom().nextBytes(iv);
         return new IvParameterSpec(iv);
     }

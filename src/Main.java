@@ -39,8 +39,6 @@ public class Main {
             InvalidKeyException, BadPaddingException, InvalidAlgorithmParameterException,
             NoSuchPaddingException, URISyntaxException {
 
-        SecretKey key = Generator.generateKey(128);
-        String algorithm = "AES/CBC/PKCS5Padding";
 //        AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance(algorithm.split("/")[0]);
 
         /*
@@ -53,6 +51,11 @@ public class Main {
                 algorithm, key, ivParameterSpec, encryptedFile, decryptedFile);
         */
 //        assertThat(inputFile).hasSameTextualContentAs(decryptedFile);
+        try {
+            Program.key = Generator.generateKey(128);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
 
         Program page = new MainPage();
     }
